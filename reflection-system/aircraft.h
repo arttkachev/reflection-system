@@ -1,8 +1,5 @@
 #pragma once
-#include <any>
 #include <string>
-#include <tuple>
-#include <vector>
 #define GET_VARIABLE_NAME(Variable) (#Variable)
 class Aircraft {
 public:
