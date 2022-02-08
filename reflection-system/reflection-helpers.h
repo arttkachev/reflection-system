@@ -10,28 +10,22 @@ static auto GetType(T const& val) {
 }
 
 // types
+template <typename T>
+struct remove_const_ref {
+  using type = std::remove_reference_t<std::remove_const_t<T>>;
+};
+
 template <typename Type>
-struct type_name {
-  constexpr static auto type_v = "undefined";
-};
+constexpr static auto type_v = type_v<typename remove_const_ref<Type>::type>;
 
 template <>
-struct type_name<int> {
-  constexpr static auto type_v = "int";
-};
+constexpr static auto type_v<int> = "int";
 
 template <>
-struct type_name<std::string> {
-  constexpr static auto type_v = "string";
-};
+constexpr static auto type_v<std::string> = "string";
 
 template <>
-struct type_name<float> {
-  constexpr static auto type_v = "float";
-};
-constexpr static auto get_type(int const val) { return type_name<int>::type_v; }
-constexpr static auto get_type(float const val) { return type_name<float>::type_v; }
-constexpr static auto get_type(std::string const& val) { return type_name<std::string>::type_v; }
+constexpr static auto type_v<float> = "float";
 
 // tuple helpers
 template <typename Tuple, typename Functor, size_t Index = 0>
@@ -98,7 +92,7 @@ auto operator!=(T const& a, T const& b)-> std::enable_if_t<IsReflectable, bool> 
 template <typename T, bool IsReflectable = is_reflectable_v<T>>
 auto operator<<(std::ostream& ostr, T const& v)-> std::enable_if_t<IsReflectable, std::ostream&> {
   reflect(v.ReflectMemberNames(), v.ReflectValues(), [&ostr](auto const& m, auto const& v) {
-    ostr << get_type(v) << " " << m << " " << v << std::endl;
+    ostr << type_v<decltype(v)> << " " << m << " " << v << std::endl;
     });
   return ostr;
 }
